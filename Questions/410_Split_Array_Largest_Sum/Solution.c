@@ -1,42 +1,68 @@
 #include <stdbool.h>
 
-bool podeDividir(int* nums, int numsSize, int k, long long somaMaximaPermitida) {
-    int subarraysNecessarios = 1;
+static inline int contarSubarraysNecessarios(int* numeros, int tamanho, long long limite) {
+    int contagem = 1;
     long long somaAtual = 0;
-
-    for (int i = 0; i < numsSize; i++) {
-        somaAtual += nums[i];
-        if (somaAtual > somaMaximaPermitida) {
-            subarraysNecessarios++;
-            somaAtual = nums[i];
+    for (int i = 0; i < tamanho; i++) {
+        somaAtual += numeros[i];
+        if (somaAtual > limite) {
+            contagem++;
+            somaAtual = numeros[i];
         }
     }
-    return subarraysNecessarios <= k;
+    return contagem;
 }
 
-int splitArray(int* nums, int numsSize, int k) {
-    long long inicioBusca = 0;
-    long long fimBusca = 0;
+int splitArray(int* numeros, int tamanho, int quantidadeSubarrays) {
+    long long limiteInferior = 0;
+    long long limiteSuperior = 0;
 
-    for (int i = 0; i < numsSize; i++) {
-        if (nums[i] > inicioBusca) {
-            inicioBusca = nums[i];
-        }
-        fimBusca += nums[i];
+    for (int i = 0; i < tamanho; i++) {
+        if (numeros[i] > limiteInferior) limiteInferior = numeros[i];
+        limiteSuperior += numeros[i];
     }
 
-    long long melhorResposta = fimBusca;
+    int subarraysEmLimiteInferior = contarSubarraysNecessarios(numeros, tamanho, limiteInferior);
+    if (subarraysEmLimiteInferior <= quantidadeSubarrays) return (int)limiteInferior;
 
-    while (inicioBusca <= fimBusca) {
-        long long meio = inicioBusca + (fimBusca - inicioBusca) / 2;
+    int subarraysEmLimiteSuperior = 1;
 
-        if (podeDividir(nums, numsSize, k, meio)) {
-            melhorResposta = meio;
-            fimBusca = meio - 1;
+    while (limiteInferior + 1 < limiteSuperior) {
+        long long intervalo = limiteSuperior - limiteInferior;
+
+        double denominador = (double)(subarraysEmLimiteInferior - subarraysEmLimiteSuperior);
+        long long palpite;
+        if (denominador <= 0.0) {
+            palpite = limiteInferior + intervalo / 2;
         } else {
-            inicioBusca = meio + 1;
+            double fatorInterpolacao = (double)(quantidadeSubarrays - subarraysEmLimiteInferior) / denominador;
+            if (fatorInterpolacao < 0.0) fatorInterpolacao = 0.0;
+            if (fatorInterpolacao > 1.0) fatorInterpolacao = 1.0;
+            long long estimativa = limiteInferior + (long long)(fatorInterpolacao * (double)intervalo);
+
+            long long margem = intervalo / 4;
+            long long minPalpite = limiteInferior + margem;
+            long long maxPalpite = limiteSuperior - margem;
+            if (minPalpite <= limiteInferior) minPalpite = limiteInferior + 1;
+            if (maxPalpite >= limiteSuperior) maxPalpite = limiteSuperior - 1;
+
+            if (estimativa < minPalpite) estimativa = minPalpite;
+            if (estimativa > maxPalpite) estimativa = maxPalpite;
+
+            if (estimativa <= limiteInferior) estimativa = limiteInferior + 1;
+            if (estimativa >= limiteSuperior) estimativa = limiteSuperior - 1;
+            palpite = estimativa;
+        }
+
+        int subarraysEmPalpite = contarSubarraysNecessarios(numeros, tamanho, palpite);
+        if (subarraysEmPalpite <= quantidadeSubarrays) {
+            limiteSuperior = palpite;
+            subarraysEmLimiteSuperior = subarraysEmPalpite;
+        } else {
+            limiteInferior = palpite;
+            subarraysEmLimiteInferior = subarraysEmPalpite;
         }
     }
 
-    return (int)melhorResposta;
+    return (int)limiteSuperior;
 }
