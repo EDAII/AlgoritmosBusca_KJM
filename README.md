@@ -15,7 +15,7 @@ Nossa dupla realizou algumas questões da plataforma LeetCode, no intuito de col
 
 **Gravação da Apresentação**:
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/vwdFHsCIXoo?si=CpSSaLYD65yy_G9k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+Link da apresentação: https://www.youtube.com/embed/vwdFHsCIXoo?si=CpSSaLYD65yy_G9k 
 
 ---
 
